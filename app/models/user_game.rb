@@ -3,6 +3,7 @@ class UserGame < ApplicationRecord
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :iron_factory_level, :copper_factory_level, :gold_factory_level,
             numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+  before_save :set_default_values
 
   def factory_throughput(type)
     current_factory_level = case type
@@ -37,5 +38,13 @@ class UserGame < ApplicationRecord
                          end
     now = Time.zone.now
     ((upgrade_started_at + upgrade_duration) - now).round(2)
+  end
+
+  private
+
+  def set_default_values
+    self.last_iron_resources_updated_at ||= Time.zone.now
+    self.last_copper_resources_updated_at ||= Time.zone.now
+    self.last_gold_resources_updated_at ||= Time.zone.now
   end
 end
