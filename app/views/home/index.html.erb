@@ -1,7 +1,7 @@
-<h1>OG2!</h1>
+<h1 class="text-center text-4xl font-bold text-indigo-800 m-6">OG2!</h1>
 <div id="game" class="container flex flex-row">
   <div id="resources" class="flex flex-col w-1/3 border-2 border-black p-4 m-2">
-    <h2 class="underline text-center text-lg text-indigo-900">Resources</h2>
+    <h2 class=" text-center text-lg text-indigo-900">Resources</h2>
     <div class="flex flex-row">
       <div class="m-6">Iron</div>
       <div class="m-6"><%= @user_game.iron_resources %></div>
@@ -17,7 +17,7 @@
   </div>
 
   <div id="factories" class="flex flex-col w-1/2 border-2 border-black p-4 m-2">
-    <h2 class="underline text-center text-lg text-indigo-900">Factories</h2>
+    <h2 class=" text-center text-lg text-indigo-900">Factories</h2>
     <table class="table-auto">
       <thead>
         <tr>
@@ -62,21 +62,26 @@
       </tr>
       </tbody>
     </table>
-
-      <% if @user_game.currently_upgrading_factory? %>
-        <p class="mt-6 text-red-500">Currently upgrading factory</p>
-        <% if @user_game.last_iron_factory_upgrade_at %>
-          <p>Iron factory from level <%= @user_game.iron_factory_level %> to level <%= @user_game.iron_factory_level + 1 %></p>
-          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:iron, @user_game.iron_factory_level) %> seconds</p>
-        <% elsif @user_game.last_copper_factory_upgrade_at %>
-          <p>Copper factory from level <%= @user_game.copper_factory_level %> to level <%= @user_game.copper_factory_level + 1 %></p>
-          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:copper, @user_game.copper_factory_level) %> seconds</p>
-        <% elsif @user_game.last_gold_factory_upgrade_at %>
-          <p>Gold factory from level <%= @user_game.gold_factory_level %> to level <%= @user_game.gold_factory_level + 1 %></p>
-          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:gold, @user_game.gold_factory_level) %> seconds</p>
-        <% end %>
-      <% else %>
-        <p class="mt-6 text-green-500">No upgrade in progress</p>
+    <% if @user_game.currently_upgrading_factory? %>
+      <p class="mt-6 text-red-500">Currently upgrading factory</p>
+      <% if @user_game.last_iron_factory_upgrade_at %>
+        <p>Iron factory from level <%= @user_game.iron_factory_level %> to level <%= @user_game.iron_factory_level + 1 %></p>
+        <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:iron, @user_game.iron_factory_level) %> seconds</p>
+      <% elsif @user_game.last_copper_factory_upgrade_at %>
+        <p>Copper factory from level <%= @user_game.copper_factory_level %> to level <%= @user_game.copper_factory_level + 1 %></p>
+        <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:copper, @user_game.copper_factory_level) %> seconds</p>
+      <% elsif @user_game.last_gold_factory_upgrade_at %>
+        <p>Gold factory from level <%= @user_game.gold_factory_level %> to level <%= @user_game.gold_factory_level + 1 %></p>
+        <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:gold, @user_game.gold_factory_level) %> seconds</p>
       <% end %>
+    <% else %>
+      <p class="mt-6 text-green-500">No upgrade in progress</p>
+    <% end %>
+  </div>
+</div>
+
+<div id="site-actions flex flex-row">
+  <div class="m-6 p-4 border-black  w-1/4 bg-red-700">
+    <%= link_to 'Sign out', destroy_user_session_path, data: { "turbo-method": :delete } %>
   </div>
 </div>
