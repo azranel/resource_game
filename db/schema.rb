@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_14_140920) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_14_143557) do
+  create_table "user_games", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "iron_resources", default: 0
+    t.integer "cooper_resources", default: 0
+    t.integer "gold_resources", default: 0
+    t.integer "iron_factory_level", default: 1
+    t.integer "cooper_factory_level", default: 1
+    t.integer "gold_factory_level", default: 1
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_games_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
