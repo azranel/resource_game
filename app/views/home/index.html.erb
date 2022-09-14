@@ -1,27 +1,23 @@
 <h1>OG2!</h1>
 <div id="game" class="container flex flex-row">
-  <div id="resources" class="flex flex-col w-1/3 border-2 border-black p-1 m-2">
-    <h2>Resources</h2>
-    <table class="table-auto">
-      <thead>
-        <tr>
-          <th>Iron</th>
-          <th>Cooper</th>
-          <th>Gold</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><%= @user_game.iron_resources %></td>
-          <td><%= @user_game.copper_resources %></td>
-          <td><%= @user_game.gold_resources %></td>
-        </tr>
-      </tbody>
-    </table>
+  <div id="resources" class="flex flex-col w-1/3 border-2 border-black p-4 m-2">
+    <h2 class="underline text-center text-lg text-indigo-900">Resources</h2>
+    <div class="flex flex-row">
+      <div class="m-6">Iron</div>
+      <div class="m-6"><%= @user_game.iron_resources %></div>
+    </div>
+    <div class="flex flex-row">
+      <div class="m-6">Copper</div>
+      <div class="m-6"><%= @user_game.copper_resources %></div>
+    </div>
+    <div class="flex flex-row">
+      <div class="m-6">Gold</div>
+      <div class="m-6"><%= @user_game.gold_resources %></div>
+    </div>
   </div>
 
   <div id="factories" class="flex flex-col w-1/2 border-2 border-black p-4 m-2">
-    <h2>Factories</h2>
+    <h2 class="underline text-center text-lg text-indigo-900">Factories</h2>
     <table class="table-auto">
       <thead>
         <tr>
@@ -55,13 +51,13 @@
       <tr class="border-b">
         <td>Actions</td>
         <td class="p-4 border-r">
-          <%= link_to 'Upgrade', upgrade_factory_path('iron'), class: 'border-2 border-black bg-indigo-500' %>
+          <%= link_to 'Upgrade', upgrade_factory_path('iron'), class: 'p-4 border-2 border-black bg-indigo-500' %>
         </td>
         <td class="p-4 border-r">
-          <%= link_to 'Upgrade', upgrade_factory_path('copper'), class: 'border-2 border-black bg-indigo-500' %>
+          <%= link_to 'Upgrade', upgrade_factory_path('copper'), class: 'p-4 border-2 border-black bg-indigo-500' %>
         </td>
         <td class="p-4 border-r">
-          <%= link_to 'Upgrade', upgrade_factory_path('gold'), class: 'border-2 border-black bg-indigo-500' %>
+          <%= link_to 'Upgrade', upgrade_factory_path('gold'), class: 'p-4 border-2 border-black bg-indigo-500' %>
         </td>
       </tr>
       </tbody>

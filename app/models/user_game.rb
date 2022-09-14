@@ -36,6 +36,6 @@ class UserGame < ApplicationRecord
                          when :gold then last_gold_factory_upgrade_at
                          end
     now = Time.zone.now
-    (upgrade_started_at + upgrade_duration) - now
+    ((upgrade_started_at + upgrade_duration) - now).round(2)
   end
 end
