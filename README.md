@@ -1,24 +1,18 @@
-# README
+# Huntertest README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Versions
 
-Things you may want to cover:
+```shell
+rails 7
+sqlite
+rspec 
+devise x.x
+```
 
-* Ruby version
+## Installation
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```shell
+bundle install
+rails db:migrate
+./bin/dev # This runs rails server, CSS processor, esbuild etc using Foreman
+```
