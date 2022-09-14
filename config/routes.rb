@@ -5,4 +5,5 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root to: "home#index"
+  get '/upgrade_factory/:factory_type', to: 'home#upgrade_factory', as: 'upgrade_factory'
 end

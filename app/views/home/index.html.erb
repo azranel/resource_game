@@ -20,23 +20,67 @@
     </table>
   </div>
 
-  <div id="factories" class="flex flex-col w-1/2 border-2 border-black p-1 m-2">
+  <div id="factories" class="flex flex-col w-1/2 border-2 border-black p-4 m-2">
     <h2>Factories</h2>
-    <table>
+    <table class="table-auto">
       <thead>
         <tr>
-          <th>Iron</th>
-          <th>Cooper</th>
-          <th>Gold</th>
+          <th></th>
+          <th class="border-r p-2">Iron</th>
+          <th class="border-r p-2">Cooper</th>
+          <th class="border-r p-2">Gold</th>
         </tr>
       </thead>
       <tbody>
-      <tr>
-        <td><%= @user_game.iron_factory_level %></td>
-        <td><%= @user_game.copper_factory_level %></td>
-        <td><%= @user_game.gold_factory_level %></td>
+      <tr class="border-b">
+        <td class="border-r">Level</td>
+        <td class="border-r p-2">
+          <%= @user_game.iron_factory_level %>
+        </td>
+        <td class="border-r p-2"><%= @user_game.copper_factory_level %></td>
+        <td class="border-r p-2"><%= @user_game.gold_factory_level %></td>
+      </tr>
+      <tr class="border-b">
+        <td class="border-r">Throughput</td>
+        <td class="border-r p-4"><%= @user_game.factory_throughput(:iron) %></td>
+        <td class="border-r p-4"><%= @user_game.factory_throughput(:iron) %></td>
+        <td class="border-r p-4"><%= @user_game.factory_throughput(:iron) %></td>
+      </tr>
+      <tr class="border-b">
+        <td class="border-r">Upgrade cost</td>
+        <td class="border-r p-4"><%= @user_game.factory_upgrade_costs(:iron) %></td>
+        <td class="border-r p-4"><%= @user_game.factory_upgrade_costs(:copper) %></td>
+        <td class="border-r p-4"><%= @user_game.factory_upgrade_costs(:gold) %></td>
+      </tr>
+      <tr class="border-b">
+        <td>Actions</td>
+        <td class="p-4 border-r">
+          <%= link_to 'Upgrade', upgrade_factory_path('iron'), class: 'border-2 border-black bg-indigo-500' %>
+        </td>
+        <td class="p-4 border-r">
+          <%= link_to 'Upgrade', upgrade_factory_path('copper'), class: 'border-2 border-black bg-indigo-500' %>
+        </td>
+        <td class="p-4 border-r">
+          <%= link_to 'Upgrade', upgrade_factory_path('gold'), class: 'border-2 border-black bg-indigo-500' %>
+        </td>
       </tr>
       </tbody>
     </table>
+
+      <% if @user_game.currently_upgrading_factory? %>
+        <p class="mt-6 text-red-500">Currently upgrading factory</p>
+        <% if @user_game.last_iron_factory_upgrade_at %>
+          <p>Iron factory from level <%= @user_game.iron_factory_level %> to level <%= @user_game.iron_factory_level + 1 %></p>
+          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:iron, @user_game.iron_factory_level) %> seconds</p>
+        <% elsif @user_game.last_copper_factory_upgrade_at %>
+          <p>Copper factory from level <%= @user_game.copper_factory_level %> to level <%= @user_game.copper_factory_level + 1 %></p>
+          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:copper, @user_game.copper_factory_level) %> seconds</p>
+        <% elsif @user_game.last_gold_factory_upgrade_at %>
+          <p>Gold factory from level <%= @user_game.gold_factory_level %> to level <%= @user_game.gold_factory_level + 1 %></p>
+          <p>Remaining time: <%= @user_game.remaining_factory_upgrade_time(:gold, @user_game.gold_factory_level) %> seconds</p>
+        <% end %>
+      <% else %>
+        <p class="mt-6 text-green-500">No upgrade in progress</p>
+      <% end %>
   </div>
 </div>

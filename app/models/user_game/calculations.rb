@@ -1,36 +1,92 @@
 class UserGame
   class Calculations
-    IRON_FACTORY_SETTINGS = {
-      1 => { production_threshold: ProductionThroughput.new(units: 10, duration: 1.second), upgrade_duration: 15.seconds, upgrade_cost: UpgradeCost.new(iron: 300, copper: 100, gold: 1) },
-      2 => { production_threshold: ProductionThroughput.new(units: 20, duration: 1.second), upgrade_duration: 30.seconds, upgrade_cost: UpgradeCost.new(iron: 800, copper: 250, gold: 2) },
-      3 => { production_threshold: ProductionThroughput.new(units: 40, duration: 1.second), upgrade_duration: 60.seconds, upgrade_cost: UpgradeCost.new(iron: 1600, copper: 500, gold: 4) },
-      4 => { production_threshold: ProductionThroughput.new(units: 80, duration: 1.second), upgrade_duration: 90.seconds, upgrade_cost: UpgradeCost.new(iron: 3000, copper: 1000, gold: 8) },
-      5 => { production_threshold: ProductionThroughput.new(units: 150, duration: 1.second), upgrade_duration: 120.seconds, upgrade_cost: nil }
-    }
-    COPPER_FACTORY_SETTINGS = {
-      1 => { production_threshold: ProductionThroughput.new(units: 3, duration: 1.second), upgrade_duration: 15.seconds, upgrade_cost: UpgradeCost.new(iron: 200, copper: 70, gold: 0) },
-      2 => { production_threshold: ProductionThroughput.new(units: 7, duration: 1.second), upgrade_duration: 30.seconds, upgrade_cost: UpgradeCost.new(iron: 400, copper: 150, gold: 0) },
-      3 => { production_threshold: ProductionThroughput.new(units: 14, duration: 1.second), upgrade_duration: 60.seconds, upgrade_cost: UpgradeCost.new(iron: 800, copper: 300, gold: 0) },
-      4 => { production_threshold: ProductionThroughput.new(units: 30, duration: 1.second), upgrade_duration: 90.seconds, upgrade_cost: UpgradeCost.new(iron: 1600, copper: 600, gold: 0) },
-      5 => { production_threshold: ProductionThroughput.new(units: 60, duration: 1.second), upgrade_duration: 120.seconds, upgrade_cost: nil }
-    }
-    GOLD_FACTORY_SETTINGS = {
-      1 => { production_threshold: ProductionThroughput.new(units: 2, duration: 1.minute), upgrade_duration: 15.seconds, upgrade_cost: UpgradeCost.new(iron: 0, copper: 100, gold: 2) },
-      2 => { production_threshold: ProductionThroughput.new(units: 3, duration: 1.minute), upgrade_duration: 30.seconds, upgrade_cost: UpgradeCost.new(iron: 0, copper: 200, gold: 4) },
-      3 => { production_threshold: ProductionThroughput.new(units: 4, duration: 1.minute), upgrade_duration: 60.seconds, upgrade_cost: UpgradeCost.new(iron: 0, copper: 400, gold: 8) },
-      4 => { production_threshold: ProductionThroughput.new(units: 6, duration: 1.minute), upgrade_duration: 90.seconds, upgrade_cost: UpgradeCost.new(iron: 0, copper: 800, gold: 16) },
-      5 => { production_threshold: ProductionThroughput.new(units: 8, duration: 1.minute), upgrade_duration: 120.seconds, upgrade_cost: nil }
-    }
-
     def initialize(user_game:)
       @user_game = user_game
     end
 
-    def calculate
-      # TODO: Do calulcations over here
+    def calculate!
+      now = Time.zone.now
+
       # 1. Check upgrades in progress
+      check_iron_factory_upgrades(now)
+      check_copper_factory_upgrades(now)
+      check_gold_factory_upgrades(now)
       # 2. Check resources generation
+      add_iron_resources(now)
+      add_copper_resources(now)
+      add_gold_resources(now)
       # 3. Update all the required fields
+      @user_game.save!
+    end
+
+    private
+
+    def check_iron_factory_upgrades(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:iron)
+      upgrade_duration = factory_settings.fetch(@user_game.iron_factory_level).fetch(:upgrade_duration)
+
+      if check_factory_upgrades(now, @user_game.last_iron_factory_upgrade_at, upgrade_duration)
+        @user_game.iron_factory_level += 1
+        @user_game.last_iron_factory_upgrade_at = nil
+      end
+    end
+
+    def check_copper_factory_upgrades(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:copper)
+      upgrade_duration = factory_settings.fetch(@user_game.copper_factory_level).fetch(:upgrade_duration)
+
+      if check_factory_upgrades(now, @user_game.last_copper_factory_upgrade_at, upgrade_duration)
+        @user_game.copper_factory_level += 1
+        @user_game.last_copper_factory_upgrade_at = nil
+      end
+    end
+
+    def check_gold_factory_upgrades(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:gold)
+      upgrade_duration = factory_settings.fetch(@user_game.gold_factory_level).fetch(:upgrade_duration)
+
+      if check_factory_upgrades(now, @user_game.last_gold_factory_upgrade_at, upgrade_duration)
+        @user_game.gold_factory_level += 1
+        @user_game.last_gold_factory_upgrade_at = nil
+      end
+    end
+
+    def add_iron_resources(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:iron)
+      throughput = factory_settings.fetch(@user_game.iron_factory_level).fetch(:production_throughput)
+      return if ((now - @user_game.last_iron_resources_updated_at) / throughput.duration).floor.zero?
+
+      @user_game.iron_resources += calculate_generated_resources_since_last_update(now, @user_game.last_iron_resources_updated_at, throughput)
+      @user_game.last_iron_resources_updated_at = now
+    end
+
+    def add_copper_resources(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:copper)
+      throughput = factory_settings.fetch(@user_game.copper_factory_level).fetch(:production_throughput)
+      return if ((now - @user_game.last_copper_resources_updated_at) / throughput.duration).floor.zero?
+
+      @user_game.copper_resources += calculate_generated_resources_since_last_update(now, @user_game.last_copper_resources_updated_at, throughput)
+      @user_game.last_copper_resources_updated_at = now
+    end
+
+    def add_gold_resources(now)
+      factory_settings = UserGame::FactorySettings.get_factory_settings_for_factory_type(:gold)
+      throughput = factory_settings.fetch(@user_game.gold_factory_level).fetch(:production_throughput)
+      return if ((now - @user_game.last_gold_resources_updated_at) / throughput.duration).floor.zero?
+
+      @user_game.gold_resources += calculate_generated_resources_since_last_update(now, @user_game.last_gold_resources_updated_at, throughput)
+      @user_game.last_gold_resources_updated_at = now
+    end
+
+    def calculate_generated_resources_since_last_update(now, last_resource_updated_at, current_throughput)
+      time_difference = ((now - last_resource_updated_at) / current_throughput.duration).floor
+      current_throughput.units * time_difference
+    end
+
+    def check_factory_upgrades(now, last_factory_upgrade_at, upgrade_duration)
+      return false if last_factory_upgrade_at.nil?
+
+      (now - last_factory_upgrade_at) > upgrade_duration
     end
   end
 end

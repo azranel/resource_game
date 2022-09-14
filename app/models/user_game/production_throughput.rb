@@ -6,5 +6,9 @@ class UserGame
       @duration = duration
       @units = units
     end
+
+    def to_s
+      "#{@units} per #{@duration.value} #{@duration.parts.keys.first.to_s.pluralize(@duration.value)}"
+    end
   end
 end
